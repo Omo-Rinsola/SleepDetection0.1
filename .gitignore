@@ -1,0 +1,45 @@
+# GLOBAL SETTINGS
+# ==============================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+.DS_Store
+.env
+*.log
+.vscode/
+.idea/
+*.egg-info/
+*.eggs/
+.mypy_cache/
+pytest_cache/
+dist/
+build/
+
+# BACKEND (FastAPI)
+# ==============================
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+
+# FRONTEND (Next.js / React)
+# ==============================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/.vercel/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# OS SPECIFIC
+# ==============================
+Thumbs.db
