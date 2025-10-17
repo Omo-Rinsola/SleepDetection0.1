@@ -21,6 +21,7 @@ build/
 # BACKEND (FastAPI)
 # ==============================
 backend/venv/
+venv/
 backend/__pycache__/
 backend/*.pyc
 

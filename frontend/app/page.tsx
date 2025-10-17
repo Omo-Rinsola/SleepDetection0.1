@@ -25,12 +25,20 @@ export default function SleepDetectionApp() {
       socket.onopen = () => {
         console.log("[WebSocket] Connected to backend ")
         setIsConnected(true)
-        // Send test message to confirm
-        socket.send("Frontend connected!")
       }
 
       socket.onmessage = (event) => {
-        console.log("[WebSocket] Message from backend:", event.data)
+        try {
+          const data = JSON.parse(event.data)
+          if (data.type === "status") {
+            setSleepStatus(data.status as SleepStatus)
+            console.log("[WebSocket] Sleep status:", data.status)
+          } else if (data.type === "error") {
+            console.error("[WebSocket] Backend error:", data.message)
+          }
+        } catch (e) {
+          console.error("[WebSocket] Failed to parse message:", event.data)
+        }
       }
 
       socket.onclose = () => {
@@ -52,12 +60,25 @@ export default function SleepDetectionApp() {
 
 
   useEffect(() => {
-    if (!isRecording) return
+    if (!isRecording || !videoRef.current || !websocketRef.current) return
 
-    const statuses: SleepStatus[] = ["awake", "sleeping", "no-face-detected"]
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
     const interval = setInterval(() => {
-      setSleepStatus(statuses[Math.floor(Math.random() * statuses.length)])
-    }, 3000)
+      if (videoRef.current && ctx && websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+        canvas.width = videoRef.current.videoWidth
+        canvas.height = videoRef.current.videoHeight
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+
+        // Convert to base64 and send via WebSocket
+        const base64Data = canvas.toDataURL('image/jpeg', 0.8).split(',')[1]
+        const message = JSON.stringify({
+          type: "frame",
+          data: base64Data
+        })
+        websocketRef.current.send(message)
+      }
+    }, 100) // Send frame every 100ms
 
     return () => clearInterval(interval)
   }, [isRecording])
