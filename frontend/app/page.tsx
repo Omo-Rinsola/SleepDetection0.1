@@ -15,6 +15,7 @@ export default function SleepDetectionApp() {
   const [isConnected, setIsConnected] = useState(false)
   const websocketRef = useRef(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const alarmRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     if (isRecording) {
@@ -31,17 +32,29 @@ export default function SleepDetectionApp() {
 
       socket.onmessage = (event) => {
         console.log("[WebSocket] Message from backend:", event.data)
+        try{
+          const data = JSON.parse(event.data)
+          if (data.type === "status") {
+            setSleepStatus(data.status as SleepStatus)
+            console.log("[Websocket] Sleep status:", data.status)
+          }
+          else if (data.type === "error") {
+          console.log("[WebSocket] Backend error:", data.message)
+          }
+        } catch (e) {
+        console.error("[WebSocket] failed to parse message", event.data)
+        }
       }
 
       socket.onclose = () => {
         console.log("[WebSocket] Disconnected ")
         setIsConnected(false)
       }
-
+//
       socket.onerror = (error) => {
         console.error("[WebSocket] Error:", error)
       }
-
+//
       // Cleanup when component unmounts or recording stops
       return () => {
         console.log("[WebSocket] Closing connection...")
@@ -52,13 +65,27 @@ export default function SleepDetectionApp() {
 
 
   useEffect(() => {
-    if (!isRecording) return
+    if (!isRecording || !videoRef.current || !websocketRef.current) return
 
-    const statuses: SleepStatus[] = ["awake", "sleeping", "no-face-detected"]
+    // creates a hidden canvas to to capture frame from webcam video, basically a drawing board
+    const canvas = document.createElement('canvas')
+    // the paint brush
+    const ctx = canvas.getContext('2d')
     const interval = setInterval(() => {
-      setSleepStatus(statuses[Math.floor(Math.random() * statuses.length)])
-    }, 3000)
+        if (videoRef.current && ctx && websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN){
+          canvas.width = videoRef.current.videoWidth
+          canvas.height = videoRef.current.videoHeight
+          ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
 
+          // convert to base64 and send via WebSocket
+          const base64Data = canvas.toDataURL('image/jpeg', 0.8).split(',')[1]
+          const message = JSON.stringify({
+            type: "frame",
+            data: base64Data
+          })
+          websocketRef.current.send(message)
+        }
+    }, 100) // Send frame every 100ms
     return () => clearInterval(interval)
   }, [isRecording])
 
@@ -144,6 +171,43 @@ export default function SleepDetectionApp() {
       }
     }
   }, [stream])
+
+  // Create alarm sound
+  useEffect(() => {
+      // Create audio element for alarm
+      const alarm = new Audio()
+      // Using a free alarm sound URL
+      alarm.src = "https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3"
+      alarm.loop = true  // Keep playing until stopped
+      alarm.volume = 0.5  // 50% volume (adjust as needed)
+      alarmRef.current = alarm
+
+      return () => {
+        // Cleanup to stop alarm when component unmounts
+        if (alarmRef.current) {
+          alarmRef.current.pause()
+          alarmRef.current = null
+        }
+      }
+  }, [])
+
+  useEffect(() => {
+    if (!alarmRef.current) return
+
+    if (sleepStatus ==="sleeping"){
+        console.log("playing alarm")
+        alarmRef.current.play().catch((error) =>{
+        console.error("failed to play alarm:", error)
+        })
+    }
+    else{
+        // stop alarm
+        console.log("stopping alarm sound")
+        alarmRef.current.pause()
+        alarmRef.current.currentTime = 0 //reset
+    }
+  }, [sleepStatus])
+
 
   const getStatusConfig = (status: SleepStatus) => {
     switch (status) {
