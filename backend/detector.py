@@ -15,7 +15,7 @@ class Detect:
         self.ear_calculator = EarCalculator()
         self.threshold = 0.2
         self.eyes_closed_start_time = None
-        self.sleep_time_threshold = 2.0
+        self.sleep_time_threshold = 1.0
 
 
     def detect(self, frame):
