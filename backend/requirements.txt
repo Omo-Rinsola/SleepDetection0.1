@@ -1,4 +1,6 @@
 fastapi
 pydantic
-uvicorn
 uvicorn[standard]
+opencv-python
+mediapipe
+numpy
