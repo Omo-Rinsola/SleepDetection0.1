@@ -85,7 +85,7 @@ export default function SleepDetectionApp() {
           })
           websocketRef.current.send(message)
         }
-    }, 30) // Send frame every 30ms
+    }, 50) // Send frame every 50ms
     return () => clearInterval(interval)
   }, [isRecording])
 
