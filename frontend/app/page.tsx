@@ -20,7 +20,7 @@ export default function SleepDetectionApp() {
   useEffect(() => {
     if (isRecording) {
       // Create WebSocket connection
-      const socket = new WebSocket("ws://localhost:8000/ws")
+      const socket = new WebSocket(process.env.NEXT_PUBLIC_BACKEND_URL || "ws://localhost:8000/ws")
       websocketRef.current = socket
 
       socket.onopen = () => {

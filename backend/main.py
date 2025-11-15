@@ -19,6 +19,7 @@ detect = Detect()
 
 origins = [
     "http://localhost:3000",
+    "https://sleep-detection0-1.vercel.app/",
 ]
 
 
