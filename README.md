@@ -108,7 +108,7 @@ const quality = 0.8; // JPEG quality
 
 ---
 
-## Future Enhancements
+## Future Enhancements / Contributions
 - Reduce latency for faster real-time updates on the live app
 - Mobile app version
 - Cloud deployment
