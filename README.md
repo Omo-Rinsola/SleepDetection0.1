@@ -54,7 +54,7 @@ The system continuously monitors the driver's eyes using a webcam feed. By apply
 ```bash
 cd backend
 pip install -r requirements.txt
-python main.py
+uvicorn main:app --reload
 ```
 
 ### Frontend Setup
