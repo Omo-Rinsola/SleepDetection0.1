@@ -129,7 +129,6 @@ Road safety is a huge concern, especially in places like Lagos where drivers end
 
 ## Future Enhancements
 
-- Audio alarm system integration
 - Mobile app version
 - Cloud deployment
 - Advanced drowsiness detection algorithms
