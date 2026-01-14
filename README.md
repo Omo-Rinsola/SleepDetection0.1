@@ -33,17 +33,19 @@ The system continuously monitors the driver's eyes using a webcam feed. By apply
 
 ---
 
-## How It Works
+## How It Works (Basic flow)
 
-- **OpenCV** → captures and processes real-time video from the webcam
-- **MediaPipe Face Mesh** → detects facial landmarks with high accuracy
-- **Eye Aspect Ratio (EAR) logic** → calculates the ratio between eye landmarks to determine if the eyes are closing
-- **WebSocket Streaming** → sends video frames from frontend to backend for processing
-- **Alarm System** → sounds an alert when EAR values suggest drowsiness
+- Your webcam captures video of your face in real time
+- forntend Sends webcam frames to the backend every 50ms 
+- MediaPipe detects landmarks around your eyes (like eyelids and corners)  
+- The backend calculates the Eye Aspect Ratio (EAR), a simple number that shows how open or closed your eyes are  
+- If EAR stays below a threshold for a few frames, the system flags drowsiness  
+- The backend sends the status to the frontend over WebSockets  
+- The frontend updates the UI and plays an alarm  
 
 ---
 
-## Installation & Setup
+## Run it locally
 
 ### Prerequisites
 - Python 3.8+
@@ -72,26 +74,11 @@ npm run dev
 
 ---
 
-## API Endpoints
+## Try it live 
 
-### WebSocket
-- `ws://localhost:8000/ws` - Real-time sleep detection endpoint
+You can test the app here: [Sleep Detection Live](https://your-live-app-link.comsleep-detection0-1.vercel.app)  
 
-**Message Format:**
-```json
-// Frontend → Backend
-{
-  "type": "frame",
-  "data": "base64-encoded-jpeg"
-}
-
-// Backend → Frontend
-{
-  "type": "status",
-  "status": "awake|sleeping|no-face-detected",
-  "ear": 0.0
-}
-```
+⚠️ Note: Real-time updates currently have noticeable latency. Improvements are planned.
 
 ---
 
@@ -112,12 +99,6 @@ const quality = 0.8; // JPEG quality
 
 ---
 
-## Why This Matters
-
-Road safety is a huge concern, especially in places like Lagos where drivers endure long commutes. This project aims to **reduce accidents caused by fatigue** and promote safer driving by providing a **simple yet effective early warning system**.
-
----
-
 ## Technologies Used
 
 - **Backend**: FastAPI, OpenCV, MediaPipe, NumPy
@@ -128,8 +109,9 @@ Road safety is a huge concern, especially in places like Lagos where drivers end
 ---
 
 ## Future Enhancements
-
+- Reduce latency for faster real-time updates on the live app
 - Mobile app version
 - Cloud deployment
 - Advanced drowsiness detection algorithms
 - Integration with vehicle systems
+- improved UI
